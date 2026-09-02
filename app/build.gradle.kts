@@ -6,6 +6,25 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+val releaseRequested = gradle.startParameter.taskNames.any {
+    it.contains("release", ignoreCase = true)
+}
+
+fun requiredReleaseEnvironmentVariable(name: String): String {
+    val value = providers.environmentVariable(name).orNull
+    if (releaseRequested && value.isNullOrBlank()) {
+        throw GradleException(
+            "Release signing requires the user-scoped environment variable $name."
+        )
+    }
+    return value.orEmpty()
+}
+
+val releaseKeystorePath = requiredReleaseEnvironmentVariable("HUSH_KEYSTORE_PATH")
+val releaseStorePassword = requiredReleaseEnvironmentVariable("HUSH_STORE_PASSWORD")
+val releaseKeyAlias = requiredReleaseEnvironmentVariable("HUSH_KEY_ALIAS")
+val releaseKeyPassword = requiredReleaseEnvironmentVariable("HUSH_KEY_PASSWORD")
+
 android {
     namespace = "space.tejaswi.hush"
     compileSdk = 35
@@ -15,11 +34,31 @@ android {
         minSdk = 26
         targetSdk = 35
         versionCode = 1
-        versionName = "0.1"
+        versionName = "0.1.0"
+    }
+    signingConfigs {
+        create("release") {
+            if (releaseRequested) {
+                val keystore = file(releaseKeystorePath)
+                if (!keystore.isFile) {
+                    throw GradleException(
+                        "Release keystore does not exist: $releaseKeystorePath"
+                    )
+                }
+                storeFile = keystore
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+                enableV1Signing = false
+                enableV2Signing = true
+                enableV3Signing = true
+            }
+        }
     }
     buildTypes {
         release {
             isMinifyEnabled = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }

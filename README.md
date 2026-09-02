@@ -27,6 +27,21 @@ Open in Android Studio (Ladybug or newer) and run. Then:
 1. Grant notification access when prompted (Settings → Notifications → Notification access → Hush).
 2. Add the Hush tile to Quick Settings (edit tiles → drag Hush in).
 
+### Signed release
+
+Release builds fail closed unless these user-scoped environment variables are present:
+
+- `HUSH_KEYSTORE_PATH`
+- `HUSH_STORE_PASSWORD`
+- `HUSH_KEY_ALIAS`
+- `HUSH_KEY_PASSWORD`
+
+Keep the keystore and credentials outside the repository. Build and check a signed release with:
+
+```powershell
+.\gradlew.bat test lintRelease assembleRelease
+```
+
 ## Known limits
 - A blocked notification may still make a brief sound/vibration before it's snoozed — listeners
   act *after* the system posts it. To fully silence, use Hold together with the app's notification
