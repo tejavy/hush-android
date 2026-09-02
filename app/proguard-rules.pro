@@ -1,0 +1,4 @@
+-keepattributes *Annotation*, InnerClasses
+-keep,includedescriptorclasses class space.tejaswi.hush.**$$serializer { *; }
+-keepclassmembers class space.tejaswi.hush.** { *** Companion; }
+-keepclasseswithmembers class space.tejaswi.hush.** { kotlinx.serialization.KSerializer serializer(...); }

@@ -1,0 +1,19 @@
+# Android Studio and Gradle
+.gradle/
+.idea/
+local.properties
+*.iml
+**/build/
+
+# Native build output
+.externalNativeBuild/
+.cxx/
+
+# Generated captures and OS metadata
+captures/
+.DS_Store
+Thumbs.db
+
+# Signing material
+*.jks
+*.keystore
